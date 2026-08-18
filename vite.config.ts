@@ -9,13 +9,13 @@ export default defineConfig({
 
 	resolve: {
 		alias: {
-			"@components": path.resolve(__dirname, "src/components"),
-			"@pages": path.resolve(__dirname, "src/pages"),
-			"@routes": path.resolve(__dirname, "src/routes"),
-			"@redux": path.resolve(__dirname, "src/redux"),
-			"@hooks": path.resolve(__dirname, "src/hooks"),
-			"@api": path.resolve(__dirname, "src/api"),
-			"@utils": path.resolve(__dirname, "src/utils"),
+			"@components": path.resolve(import.meta.dirname, "src/components"),
+			"@pages": path.resolve(import.meta.dirname, "src/pages"),
+			"@routes": path.resolve(import.meta.dirname, "src/routes"),
+			"@redux": path.resolve(import.meta.dirname, "src/redux"),
+			"@hooks": path.resolve(import.meta.dirname, "src/hooks"),
+			"@api": path.resolve(import.meta.dirname, "src/api"),
+			"@utils": path.resolve(import.meta.dirname, "src/utils"),
 		},
 	},
 });
