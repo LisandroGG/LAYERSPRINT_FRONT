@@ -6,7 +6,7 @@ import {
 	fetchProducts,
 	fetchProductsNoPaginated,
 	updateProduct,
-} from "./productsThunks";
+} from "./productThunks";
 import type { ProductState } from "./productTypes";
 
 const initialState: ProductState = {
@@ -52,14 +52,16 @@ const productSlice = createSlice({
 				state.selected = action.payload;
 			})
 			.addCase(createProduct.fulfilled, (state, action) => {
-				state.items.push(action.payload);
+				state.items.push(action.payload.product);
 			})
 			.addCase(updateProduct.fulfilled, (state, action) => {
-				const index = state.items.findIndex((p) => p.id === action.payload.id);
-				if (index !== -1) state.items[index] = action.payload;
+				const index = state.items.findIndex(
+					(p) => p.id === action.payload.product.id,
+				);
+				if (index !== -1) state.items[index] = action.payload.product;
 			})
 			.addCase(deleteProduct.fulfilled, (state, action) => {
-				state.items = state.items.filter((p) => p.id !== action.payload);
+				state.items = state.items.filter((p) => p.id !== action.payload.id);
 			});
 	},
 });

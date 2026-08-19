@@ -29,7 +29,7 @@ export const fetchProducts = createAsyncThunk(
 export const fetchProductsNoPaginated = createAsyncThunk(
 	"products/fetchAllNoPaginated",
 	async () => {
-		const { data } = await axios.get<Product[]>("/products/all");
+		const { data } = await axios.get<Product[]>("/products/not-paginated");
 		return data;
 	},
 );
@@ -49,7 +49,7 @@ export const createProduct = createAsyncThunk(
 		const { data } = await axios.post("/products", formData, {
 			headers: { "Content-Type": "multipart/form-data" },
 		});
-		return data.product as Product;
+		return data as { product: Product; message: string };
 	},
 );
 
@@ -60,14 +60,14 @@ export const updateProduct = createAsyncThunk(
 		const { data } = await axios.put(`/products/${id}`, formData, {
 			headers: { "Content-Type": "multipart/form-data" },
 		});
-		return data.product as Product;
+		return data as { product: Product; message: string };
 	},
 );
 
 export const deleteProduct = createAsyncThunk(
 	"products/delete",
 	async (id: number) => {
-		await axios.delete(`/products/${id}`);
-		return id;
+		const { data } = await axios.delete(`/products/${id}`);
+		return { id, message: data.message as string };
 	},
 );

@@ -48,14 +48,16 @@ const filamentSlice = createSlice({
 				state.items = action.payload;
 			})
 			.addCase(createFilament.fulfilled, (state, action) => {
-				state.items.push(action.payload);
+				state.items.push(action.payload.filament);
 			})
 			.addCase(updateFilament.fulfilled, (state, action) => {
-				const index = state.items.findIndex((f) => f.id === action.payload.id);
-				if (index !== -1) state.items[index] = action.payload;
+				const index = state.items.findIndex(
+					(f) => f.id === action.payload.filament.id,
+				);
+				if (index !== -1) state.items[index] = action.payload.filament;
 			})
 			.addCase(deleteFilament.fulfilled, (state, action) => {
-				state.items = state.items.filter((f) => f.id !== action.payload);
+				state.items = state.items.filter((f) => f.id !== action.payload.id);
 			});
 	},
 });

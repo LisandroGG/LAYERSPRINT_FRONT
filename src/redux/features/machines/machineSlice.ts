@@ -48,14 +48,16 @@ const machineSlice = createSlice({
 				state.items = action.payload;
 			})
 			.addCase(createMachine.fulfilled, (state, action) => {
-				state.items.push(action.payload);
+				state.items.push(action.payload.machine);
 			})
 			.addCase(updateMachine.fulfilled, (state, action) => {
-				const index = state.items.findIndex((m) => m.id === action.payload.id);
-				if (index !== -1) state.items[index] = action.payload;
+				const index = state.items.findIndex(
+					(m) => m.id === action.payload.machine.id,
+				);
+				if (index !== -1) state.items[index] = action.payload.machine;
 			})
 			.addCase(deleteMachine.fulfilled, (state, action) => {
-				state.items = state.items.filter((m) => m.id !== action.payload);
+				state.items = state.items.filter((m) => m.id !== action.payload.id);
 			});
 	},
 });

@@ -13,7 +13,7 @@ export const fetchFilaments = createAsyncThunk(
 export const fetchFilamentsNoPaginated = createAsyncThunk(
 	"filaments/fetchAllNoPaginated",
 	async () => {
-		const { data } = await axios.get<Filament[]>("/filaments/all");
+		const { data } = await axios.get<Filament[]>("/filaments/not-paginated");
 		return data;
 	},
 );
@@ -22,7 +22,7 @@ export const createFilament = createAsyncThunk(
 	"filaments/create",
 	async (payload: FilamentInput) => {
 		const { data } = await axios.post("/filaments", payload);
-		return data.filament as Filament;
+		return data as { filament: Filament; message: string };
 	},
 );
 
@@ -30,14 +30,14 @@ export const updateFilament = createAsyncThunk(
 	"filaments/update",
 	async ({ id, payload }: { id: number; payload: FilamentInput }) => {
 		const { data } = await axios.put(`/filaments/${id}`, payload);
-		return data.filament as Filament;
+		return data as { filament: Filament; message: string };
 	},
 );
 
 export const deleteFilament = createAsyncThunk(
 	"filaments/delete",
 	async (id: number) => {
-		await axios.delete(`/filaments/${id}`);
-		return id;
+		const { data } = await axios.delete(`/filaments/${id}`);
+		return { id, message: data.message as string };
 	},
 );
