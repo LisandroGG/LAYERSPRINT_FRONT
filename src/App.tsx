@@ -7,15 +7,17 @@ import { Toaster } from "sonner";
 
 function App() {
 	return (
-		<div className="min-h-screen bg-ink">
+		<div className="flex h-screen flex-col bg-ink">
 			<Toaster richColors position="top-right" />
 			<NavBar />
-			<Routes>
-				<Route path="/" element={<MachinesPage />} />
-				<Route path="/machines" element={<MachinesPage />} />
-				<Route path="/filaments" element={<FilamentsPage />} />
-				<Route path="/products" element={<ProductsPage />} />
-			</Routes>
+			<main className="flex-1 overflow-hidden">
+				<Routes>
+					<Route path="/" element={<MachinesPage />} />
+					<Route path="/machines" element={<MachinesPage />} />
+					<Route path="/filaments" element={<FilamentsPage />} />
+					<Route path="/products" element={<ProductsPage />} />
+				</Routes>
+			</main>
 		</div>
 	);
 }

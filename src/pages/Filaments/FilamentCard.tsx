@@ -1,3 +1,4 @@
+import Button from "@components/Common/Button";
 import type { Filament } from "@redux/features/filaments/filamentTypes";
 import { getColorHex } from "@utils/colorSwatch";
 
@@ -38,20 +39,22 @@ export default function FilamentCard({
 			</div>
 
 			<div className="mt-4 flex gap-2">
-				<button
+				<Button
 					type="button"
 					onClick={() => onEdit(filament)}
-					className="flex-1 rounded-lg border border-border py-1.5 text-sm text-white hover:bg-surface-hover"
+					variant="outline"
+					size="sm"
 				>
 					Editar
-				</button>
-				<button
+				</Button>
+				<Button
 					type="button"
 					onClick={() => onDelete(filament)}
-					className="flex-1 rounded-lg border border-danger/40 py-1.5 text-sm text-danger hover:bg-danger/10"
+					variant="danger"
+					size="sm"
 				>
 					Eliminar
-				</button>
+				</Button>
 			</div>
 		</div>
 	);

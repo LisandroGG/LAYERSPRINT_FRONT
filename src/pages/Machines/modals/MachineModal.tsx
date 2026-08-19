@@ -1,3 +1,4 @@
+import Button from "@components/Common/Button";
 import useCrudDispatch from "@hooks/useCrudDispatch";
 import {
 	createMachine,
@@ -122,24 +123,16 @@ export default function MachineModal({
 					</div>
 
 					<div className="flex justify-end gap-2 pt-2">
-						<button
-							type="button"
-							onClick={onClose}
-							className="rounded-lg px-4 py-2 text-sm text-muted hover:bg-surface-hover"
-						>
+						<Button type="button" onClick={onClose} variant="ghost">
 							Cancelar
-						</button>
-						<button
-							type="submit"
-							disabled={submitting}
-							className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-50"
-						>
+						</Button>
+						<Button type="submit" disabled={submitting}>
 							{submitting
 								? "Guardando..."
 								: machineToEdit
 									? "Guardar cambios"
 									: "Crear máquina"}
-						</button>
+						</Button>
 					</div>
 				</form>
 			</div>

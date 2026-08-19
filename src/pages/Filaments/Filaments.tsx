@@ -1,67 +1,73 @@
-import { useState } from 'react'
-import { useAppSelector } from '@redux/hooks'
-import useCrudDispatch from '@hooks/useCrudDispatch'
-import usePagination from '@hooks/usePagination'
-import { fetchFilaments, deleteFilament } from '@redux/features/filaments/filamentThunks'
-import type { Filament } from '@redux/features/filaments/filamentTypes'
-import PageHeader from '@components/PageHeader/PageHeader'
-import Pagination from '../../components/Common/Pagination'
-import FilamentCard from './FilamentCard'
-import FilamentModal from './modals/FilamentModal'
+import Button from "@components/Common/Button";
+import ConfirmModal from "@components/Common/ConfirmModal";
+import PageHeader from "@components/PageHeader/PageHeader";
+import useCrudDispatch from "@hooks/useCrudDispatch";
+import usePagination from "@hooks/usePagination";
+import {
+	deleteFilament,
+	fetchFilaments,
+} from "@redux/features/filaments/filamentThunks";
+import type { Filament } from "@redux/features/filaments/filamentTypes";
+import { useAppSelector } from "@redux/hooks";
+import { useState } from "react";
+import Pagination from "../../components/Common/Pagination";
+import FilamentCard from "./FilamentCard";
+import FilamentModal from "./modals/FilamentModal";
 
 export default function FilamentsPage() {
-	const { run } = useCrudDispatch()
-	const { items: filaments } = useAppSelector((state) => state.filaments)
-	const { page, totalPages, hasNext, hasPrev, loading, goToPage } = usePagination(
-		(state) => state.filaments,
-		fetchFilaments,
-	)
+	const { run } = useCrudDispatch();
+	const { items: filaments } = useAppSelector((state) => state.filaments);
+	const { page, totalPages, hasNext, hasPrev, loading, goToPage } =
+		usePagination((state) => state.filaments, fetchFilaments);
 
-	const [modalOpen, setModalOpen] = useState(false)
-	const [filamentToEdit, setFilamentToEdit] = useState<Filament | null>(null)
+	const [modalOpen, setModalOpen] = useState(false);
+	const [filamentToEdit, setFilamentToEdit] = useState<Filament | null>(null);
+
+	const [filamentToDelete, setFilamentToDelete] = useState<Filament | null>(
+		null,
+	);
+	const [deleting, setDeleting] = useState(false);
 
 	function handleCreate() {
-		setFilamentToEdit(null)
-		setModalOpen(true)
+		setFilamentToEdit(null);
+		setModalOpen(true);
 	}
 
 	function handleEdit(filament: Filament) {
-		setFilamentToEdit(filament)
-		setModalOpen(true)
+		setFilamentToEdit(filament);
+		setModalOpen(true);
 	}
 
-	async function handleDelete(filament: Filament) {
-		const confirmed = window.confirm(`¿Eliminar "${filament.brand} - ${filament.color}"?`)
-		if (!confirmed) return
-		await run(deleteFilament, filament.id)
+	function handleDelete(filament: Filament) {
+		setFilamentToDelete(filament);
+	}
+
+	async function confirmDelete() {
+		if (!filamentToDelete) return;
+		setDeleting(true);
+		await run(deleteFilament, filamentToDelete.id);
+		setDeleting(false);
+		setFilamentToDelete(null);
 	}
 
 	return (
-		<div>
+		<div className="flex h-full flex-col">
 			<PageHeader
 				title="Filamentos"
-				action={
-					<button
-						onClick={handleCreate}
-						className="cursor-pointer rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark"
-					>
-						+ Nuevo filamento
-					</button>
-				}
+				action={<Button onClick={handleCreate}>+ Nuevo filamento</Button>}
 			/>
 
-			<div className="p-6">
+			<div className="flex-1 overflow-y-auto p-6">
 				{loading && <p className="font-mono text-sm text-muted">Cargando...</p>}
 
 				{!loading && filaments.length === 0 && (
 					<div className="rounded-xl border border-dashed border-border bg-surface/50 p-10 text-center">
-						<p className="font-display text-muted">Todavía no cargaste ningún filamento.</p>
-						<button
-							onClick={handleCreate}
-							className="mt-4 cursor-pointer rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark"
-						>
+						<p className="font-display text-muted">
+							Todavía no cargaste ningún filamento.
+						</p>
+						<Button onClick={handleCreate} className="mt-4">
 							Cargar el primero
-						</button>
+						</Button>
 					</div>
 				)}
 
@@ -75,25 +81,33 @@ export default function FilamentsPage() {
 						/>
 					))}
 				</div>
-
-				{!loading && filaments.length > 0 && (
-					<div className="mt-6">
-						<Pagination
-							page={page}
-							totalPages={totalPages}
-							hasNext={hasNext}
-							hasPrev={hasPrev}
-							onPageChange={goToPage}
-						/>
-					</div>
-				)}
 			</div>
+
+			{!loading && filaments.length > 0 && (
+				<div className="border-t border-border px-6 py-4">
+					<Pagination
+						page={page}
+						totalPages={totalPages}
+						hasNext={hasNext}
+						hasPrev={hasPrev}
+						onPageChange={goToPage}
+					/>
+				</div>
+			)}
 
 			<FilamentModal
 				open={modalOpen}
 				onClose={() => setModalOpen(false)}
 				filamentToEdit={filamentToEdit}
 			/>
+			<ConfirmModal
+				open={!!filamentToDelete}
+				title="Eliminar filamento"
+				message={`¿Eliminar "${filamentToDelete?.brand} - ${filamentToDelete?.color}"? Esta acción no se puede deshacer.`}
+				onConfirm={confirmDelete}
+				onCancel={() => setFilamentToDelete(null)}
+				loading={deleting}
+			/>
 		</div>
-	)
+	);
 }

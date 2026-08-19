@@ -1,3 +1,4 @@
+import Button from "@components/Common/Button";
 import type { Filament } from "@redux/features/filaments/filamentTypes";
 import { getColorHex } from "../../utils/colorSwatch";
 
@@ -59,13 +60,9 @@ export default function FilamentRow({
 				className="w-24 rounded-lg border border-border bg-ink px-3 py-2 text-sm font-mono text-white outline-none focus:border-brand"
 			/>
 
-			<button
-				type="button"
-				onClick={onRemove}
-				className="shrink-0 rounded-lg border border-danger/40 px-2 py-2 text-sm text-danger hover:bg-danger/10"
-			>
+			<Button type="button" onClick={onRemove} variant="danger">
 				✕
-			</button>
+			</Button>
 		</div>
 	);
 }

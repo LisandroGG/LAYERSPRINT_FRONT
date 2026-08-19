@@ -1,3 +1,4 @@
+import Button from "@components/Common/Button";
 import TimeInput from "@components/Common/TimeInput";
 import useCrudDispatch from "@hooks/useCrudDispatch";
 import { fetchFilamentsNoPaginated } from "@redux/features/filaments/filamentThunks";
@@ -36,9 +37,9 @@ export default function ProductModal({
 	const [timeToPrint, setTimeToPrint] = useState(0);
 	const [laborCost, setLaborCost] = useState(0);
 	const [extras, setExtras] = useState(0);
-	const [filamentRows, setFilamentRows] = useState<FilamentRowValue[]>([
-		{ filamentId: 0, gramsUsed: 0 },
-	]);
+	const [filamentRows, setFilamentRows] = useState<
+		(FilamentRowValue & { rowId: string })[]
+	>([{ rowId: crypto.randomUUID(), filamentId: 0, gramsUsed: 0 }]);
 	const [image, setImage] = useState<File | undefined>(undefined);
 	const [preview, setPreview] = useState<string | null>(null);
 	const [submitting, setSubmitting] = useState(false);
@@ -64,7 +65,9 @@ export default function ProductModal({
 			setTimeToPrint(0);
 			setLaborCost(0);
 			setExtras(0);
-			setFilamentRows([{ filamentId: 0, gramsUsed: 0 }]);
+			setFilamentRows([
+				{ rowId: crypto.randomUUID(), filamentId: 0, gramsUsed: 0 },
+			]);
 			setPreview(null);
 			setImage(undefined);
 		}
@@ -78,7 +81,9 @@ export default function ProductModal({
 	);
 
 	function updateRow(index: number, value: FilamentRowValue) {
-		setFilamentRows((rows) => rows.map((r, i) => (i === index ? value : r)));
+		setFilamentRows((rows) =>
+			rows.map((r, i) => (i === index ? { ...r, ...value } : r)),
+		);
 	}
 
 	function removeRow(index: number) {
@@ -86,7 +91,10 @@ export default function ProductModal({
 	}
 
 	function addRow() {
-		setFilamentRows((rows) => [...rows, { filamentId: 0, gramsUsed: 0 }]);
+		setFilamentRows((rows) => [
+			...rows,
+			{ rowId: crypto.randomUUID(), filamentId: 0, gramsUsed: 0 },
+		]);
 	}
 
 	function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -99,9 +107,9 @@ export default function ProductModal({
 	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();
 
-		const validRows = filamentRows.filter(
-			(r) => r.filamentId && r.gramsUsed > 0,
-		);
+		const validRows = filamentRows
+			.filter((r) => r.filamentId && r.gramsUsed > 0)
+			.map(({ filamentId, gramsUsed }) => ({ filamentId, gramsUsed }));
 
 		if (!name.trim() || !machineId || !validRows.length) {
 			toast.error("Nombre, máquina y al menos un filamento son obligatorios");
@@ -226,7 +234,7 @@ export default function ProductModal({
 						<div className="space-y-2">
 							{filamentRows.map((row, index) => (
 								<FilamentRow
-									key={index}
+									key={row.rowId}
 									value={row}
 									filaments={filaments}
 									onChange={(value) => updateRow(index, value)}
@@ -238,7 +246,7 @@ export default function ProductModal({
 						<button
 							type="button"
 							onClick={addRow}
-							className="mt-2 text-sm text-brand-light hover:text-white"
+							className="mt-2 text-sm text-brand-light hover:text-white cursor-pointer"
 						>
 							+ agregar filamento
 						</button>
@@ -275,24 +283,16 @@ export default function ProductModal({
 					</div>
 
 					<div className="flex justify-end gap-2 pt-2">
-						<button
-							type="button"
-							onClick={onClose}
-							className="rounded-lg px-4 py-2 text-sm text-muted hover:bg-surface-hover"
-						>
+						<Button type="button" onClick={onClose} variant="ghost">
 							Cancelar
-						</button>
-						<button
-							type="submit"
-							disabled={submitting}
-							className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-50"
-						>
+						</Button>
+						<Button type="submit" disabled={submitting}>
 							{submitting
 								? "Guardando..."
 								: productToEdit
 									? "Guardar cambios"
 									: "Crear producto"}
-						</button>
+						</Button>
 					</div>
 				</form>
 			</div>

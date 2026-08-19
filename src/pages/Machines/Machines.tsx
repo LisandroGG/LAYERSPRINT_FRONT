@@ -1,67 +1,68 @@
-import { useState } from 'react'
-import { useAppSelector } from '@redux/hooks'
-import useCrudDispatch from '@hooks/useCrudDispatch'
-import usePagination from '@hooks/usePagination'
-import { fetchMachines, deleteMachine } from '@redux/features/machines/machineThunks'
-import type { Machine } from '@redux/features/machines/machineTypes'
-import PageHeader from '@components/PageHeader/PageHeader'
-import Pagination from '../../components/Common/Pagination'
-import MachineCard from './MachineCard'
-import MachineModal from './modals/MachineModal'
+import Button from "@components/Common/Button";
+import ConfirmModal from "@components/Common/ConfirmModal";
+import Pagination from "@components/Common/Pagination";
+import PageHeader from "@components/PageHeader/PageHeader";
+import useCrudDispatch from "@hooks/useCrudDispatch";
+import usePagination from "@hooks/usePagination";
+import {
+	deleteMachine,
+	fetchMachines,
+} from "@redux/features/machines/machineThunks";
+import type { Machine } from "@redux/features/machines/machineTypes";
+import { useAppSelector } from "@redux/hooks";
+import { useState } from "react";
+import MachineCard from "./MachineCard";
+import MachineModal from "./modals/MachineModal";
 
 export default function MachinesPage() {
-	const { run } = useCrudDispatch()
-	const { items: machines } = useAppSelector((state) => state.machines)
-	const { page, totalPages, hasNext, hasPrev, loading, goToPage } = usePagination(
-		(state) => state.machines,
-		fetchMachines,
-	)
+	const { run } = useCrudDispatch();
+	const { items: machines } = useAppSelector((state) => state.machines);
+	const { page, totalPages, hasNext, hasPrev, loading, goToPage } =
+		usePagination((state) => state.machines, fetchMachines);
 
-	const [modalOpen, setModalOpen] = useState(false)
-	const [machineToEdit, setMachineToEdit] = useState<Machine | null>(null)
+	const [modalOpen, setModalOpen] = useState(false);
+	const [machineToEdit, setMachineToEdit] = useState<Machine | null>(null);
+	const [machineToDelete, setMachineToDelete] = useState<Machine | null>(null);
+	const [deleting, setDeleting] = useState(false);
 
 	function handleCreate() {
-		setMachineToEdit(null)
-		setModalOpen(true)
+		setMachineToEdit(null);
+		setModalOpen(true);
 	}
 
 	function handleEdit(machine: Machine) {
-		setMachineToEdit(machine)
-		setModalOpen(true)
+		setMachineToEdit(machine);
+		setModalOpen(true);
 	}
 
-	async function handleDelete(machine: Machine) {
-		const confirmed = window.confirm(`¿Eliminar la máquina "${machine.name}"?`)
-		if (!confirmed) return
-		await run(deleteMachine, machine.id)
+	function handleDelete(machine: Machine) {
+		setMachineToDelete(machine);
+	}
+
+	async function confirmDelete() {
+		if (!machineToDelete) return;
+		setDeleting(true);
+		await run(deleteMachine, machineToDelete.id);
+		setDeleting(false);
+		setMachineToDelete(null);
 	}
 
 	return (
-		<div>
+		<div className="flex h-full flex-col">
 			<PageHeader
 				title="Máquinas"
-				action={
-					<button
-						onClick={handleCreate}
-						className="cursor-pointer rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark"
-					>
-						+ Nueva máquina
-					</button>
-				}
+				action={<Button onClick={handleCreate}>+ Nuevo máquina</Button>}
 			/>
 
-			<div className="p-6">
+			<div className="flex-1 overflow-y-auto p-6">
 				{loading && <p className="font-mono text-sm text-muted">Cargando...</p>}
 
 				{!loading && machines.length === 0 && (
 					<div className="rounded-xl border border-dashed border-border bg-surface/50 p-10 text-center">
-						<p className="font-display text-muted">Todavía no cargaste ninguna máquina.</p>
-						<button
-							onClick={handleCreate}
-							className="mt-4 cursor-pointer rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark"
-						>
-							Cargar la primera
-						</button>
+						<p className="font-display text-muted">
+							Todavía no cargaste ninguna máquina.
+						</p>
+						<Button onClick={handleCreate}>Cargar la primera</Button>
 					</div>
 				)}
 
@@ -75,25 +76,33 @@ export default function MachinesPage() {
 						/>
 					))}
 				</div>
-
-				{!loading && machines.length > 0 && (
-					<div className="mt-6">
-						<Pagination
-							page={page}
-							totalPages={totalPages}
-							hasNext={hasNext}
-							hasPrev={hasPrev}
-							onPageChange={goToPage}
-						/>
-					</div>
-				)}
 			</div>
+
+			{!loading && machines.length > 0 && (
+				<div className="border-t border-border px-6 py-4">
+					<Pagination
+						page={page}
+						totalPages={totalPages}
+						hasNext={hasNext}
+						hasPrev={hasPrev}
+						onPageChange={goToPage}
+					/>
+				</div>
+			)}
 
 			<MachineModal
 				open={modalOpen}
 				onClose={() => setModalOpen(false)}
 				machineToEdit={machineToEdit}
 			/>
+			<ConfirmModal
+				open={!!machineToDelete}
+				title="Eliminar máquina"
+				message={`¿Eliminar la máquina "${machineToDelete?.name}"? Esta acción no se puede deshacer.`}
+				onConfirm={confirmDelete}
+				onCancel={() => setMachineToDelete(null)}
+				loading={deleting}
+			/>
 		</div>
-	)
+	);
 }

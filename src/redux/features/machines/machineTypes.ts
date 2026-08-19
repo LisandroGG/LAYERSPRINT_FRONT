@@ -8,14 +8,14 @@ export type Machine = {
 export type MachineInput = Omit<Machine, "id">;
 
 export type MachineState = {
-	items: Machine[]
-	selected: Machine | null
-	total: number
-	page: number
-	limit: number
-	totalPages: number
-	hasNext: boolean
-	hasPrev: boolean
-	loading: boolean
-	error: string | null
-}
+	items: Machine[];
+	selected: Machine | null;
+	total: number;
+	page: number;
+	limit: number;
+	totalPages: number;
+	hasNext: boolean;
+	hasPrev: boolean;
+	loading: boolean;
+	error: string | null;
+};
