@@ -1,56 +1,49 @@
-import useCrudDispatch from "@hooks/useCrudDispatch";
-import {
-	deleteFilament,
-	fetchFilamentsNoPaginated,
-} from "@redux/features/filaments/filamentThunks";
-import type { Filament } from "@redux/features/filaments/filamentTypes";
-import { useAppDispatch, useAppSelector } from "@redux/hooks";
-import { useEffect, useState } from "react";
-import PageHeader from "../../components/PageHeader/PageHeader";
-import FilamentCard from "./FilamentCard";
-import FilamentModal from "./modals/FilamentModal";
+import { useState } from 'react'
+import { useAppSelector } from '@redux/hooks'
+import useCrudDispatch from '@hooks/useCrudDispatch'
+import usePagination from '@hooks/usePagination'
+import { fetchFilaments, deleteFilament } from '@redux/features/filaments/filamentThunks'
+import type { Filament } from '@redux/features/filaments/filamentTypes'
+import PageHeader from '@components/PageHeader/PageHeader'
+import Pagination from '../../components/Common/Pagination'
+import FilamentCard from './FilamentCard'
+import FilamentModal from './modals/FilamentModal'
 
 export default function FilamentsPage() {
-	const dispatch = useAppDispatch();
-	const { run } = useCrudDispatch();
-	const { items: filaments, loading } = useAppSelector(
+	const { run } = useCrudDispatch()
+	const { items: filaments } = useAppSelector((state) => state.filaments)
+	const { page, totalPages, hasNext, hasPrev, loading, goToPage } = usePagination(
 		(state) => state.filaments,
-	);
+		fetchFilaments,
+	)
 
-	const [modalOpen, setModalOpen] = useState(false);
-	const [filamentToEdit, setFilamentToEdit] = useState<Filament | null>(null);
-
-	useEffect(() => {
-		dispatch(fetchFilamentsNoPaginated());
-	}, [dispatch]);
+	const [modalOpen, setModalOpen] = useState(false)
+	const [filamentToEdit, setFilamentToEdit] = useState<Filament | null>(null)
 
 	function handleCreate() {
-		setFilamentToEdit(null);
-		setModalOpen(true);
+		setFilamentToEdit(null)
+		setModalOpen(true)
 	}
 
 	function handleEdit(filament: Filament) {
-		setFilamentToEdit(filament);
-		setModalOpen(true);
+		setFilamentToEdit(filament)
+		setModalOpen(true)
 	}
 
 	async function handleDelete(filament: Filament) {
-		const confirmed = window.confirm(
-			`¿Eliminar "${filament.brand} - ${filament.color}"?`,
-		);
-		if (!confirmed) return;
-		await run(deleteFilament, filament.id);
+		const confirmed = window.confirm(`¿Eliminar "${filament.brand} - ${filament.color}"?`)
+		if (!confirmed) return
+		await run(deleteFilament, filament.id)
 	}
 
 	return (
-		<div className="min-h-screen bg-ink">
+		<div>
 			<PageHeader
 				title="Filamentos"
 				action={
 					<button
-						type="button"
 						onClick={handleCreate}
-						className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark"
+						className="cursor-pointer rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark"
 					>
 						+ Nuevo filamento
 					</button>
@@ -62,13 +55,10 @@ export default function FilamentsPage() {
 
 				{!loading && filaments.length === 0 && (
 					<div className="rounded-xl border border-dashed border-border bg-surface/50 p-10 text-center">
-						<p className="font-display text-muted">
-							Todavía no cargaste ningún filamento.
-						</p>
+						<p className="font-display text-muted">Todavía no cargaste ningún filamento.</p>
 						<button
-							type="button"
 							onClick={handleCreate}
-							className="mt-4 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark"
+							className="mt-4 cursor-pointer rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark"
 						>
 							Cargar el primero
 						</button>
@@ -85,6 +75,18 @@ export default function FilamentsPage() {
 						/>
 					))}
 				</div>
+
+				{!loading && filaments.length > 0 && (
+					<div className="mt-6">
+						<Pagination
+							page={page}
+							totalPages={totalPages}
+							hasNext={hasNext}
+							hasPrev={hasPrev}
+							onPageChange={goToPage}
+						/>
+					</div>
+				)}
 			</div>
 
 			<FilamentModal
@@ -93,5 +95,5 @@ export default function FilamentsPage() {
 				filamentToEdit={filamentToEdit}
 			/>
 		</div>
-	);
+	)
 }
