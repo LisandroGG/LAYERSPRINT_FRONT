@@ -13,6 +13,10 @@ const initialState: MachineState = {
 	selected: null,
 	total: 0,
 	page: 1,
+	limit: 9,
+	totalPages: 0,
+	hasNext: false,
+	hasPrev: false,
 	loading: false,
 	error: null,
 };
@@ -39,6 +43,10 @@ const machineSlice = createSlice({
 				state.items = action.payload.data;
 				state.total = action.payload.total;
 				state.page = action.payload.page;
+				state.limit = action.payload.limit;
+				state.totalPages = action.payload.totalPages;
+				state.hasNext = action.payload.hasNext;
+				state.hasPrev = action.payload.hasPrev;
 			})
 			.addCase(fetchMachines.rejected, (state, action) => {
 				state.loading = false;

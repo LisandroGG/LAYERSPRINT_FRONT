@@ -20,8 +20,9 @@ function buildProductFormData(payload: ProductInput) {
 
 export const fetchProducts = createAsyncThunk(
 	"products/fetchAll",
-	async (page: number = 1) => {
-		const { data } = await axios.get(`/products?page=${page}`);
+	async (params: Record<string, unknown> = {}) => {
+		const query = new URLSearchParams(params as Record<string, string>).toString();
+		const { data } = await axios.get(`/products?${query}`);
 		return data;
 	},
 );

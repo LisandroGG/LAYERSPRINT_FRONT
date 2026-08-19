@@ -3,12 +3,13 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { Machine, MachineInput } from "./machineTypes";
 
 export const fetchMachines = createAsyncThunk(
-	"machines/fetchAll",
-	async (page: number = 1) => {
-		const { data } = await axios.get(`/machines?page=${page}`);
-		return data;
+	'machines/fetchAll',
+	async (params: Record<string, unknown> = {}) => {
+		const query = new URLSearchParams(params as Record<string, string>).toString()
+		const { data } = await axios.get(`/machines?${query}`)
+		return data
 	},
-);
+)
 
 export const fetchMachinesNoPaginated = createAsyncThunk(
 	"machines/fetchAllNoPaginated",

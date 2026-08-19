@@ -38,6 +38,10 @@ export type ProductState = {
 	selected: Product | null;
 	total: number;
 	page: number;
+	limit: number;
+	totalPages: number;
+	hasNext: boolean;
+	hasPrev: boolean;
 	loading: boolean;
 	error: string | null;
 };

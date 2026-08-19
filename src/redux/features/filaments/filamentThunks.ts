@@ -4,8 +4,9 @@ import type { Filament, FilamentInput } from "./filamentTypes";
 
 export const fetchFilaments = createAsyncThunk(
 	"filaments/fetchAll",
-	async (page: number = 1) => {
-		const { data } = await axios.get(`/filaments?page=${page}`);
+	async (params: Record<string, unknown> = {}) => {
+		const query = new URLSearchParams(params as Record<string, string>).toString();
+		const { data } = await axios.get(`/filaments?${query}`);
 		return data;
 	},
 );

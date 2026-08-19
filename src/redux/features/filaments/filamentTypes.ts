@@ -14,6 +14,10 @@ export type FilamentState = {
 	selected: Filament | null;
 	total: number;
 	page: number;
+	limit: number;
+	totalPages: number;
+	hasNext: boolean;
+	hasPrev: boolean;
 	loading: boolean;
 	error: string | null;
 };
