@@ -8,11 +8,7 @@ type FilamentCardProps = {
 	onDelete: (filament: Filament) => void;
 };
 
-export default function FilamentCard({
-	filament,
-	onEdit,
-	onDelete,
-}: FilamentCardProps) {
+const FilamentCard = ({ filament, onEdit, onDelete }: FilamentCardProps) => {
 	return (
 		<div className="rounded-xl border border-border bg-surface p-4 transition-colors hover:border-brand-light/50">
 			<div className="flex items-start justify-between">
@@ -58,4 +54,6 @@ export default function FilamentCard({
 			</div>
 		</div>
 	);
-}
+};
+
+export default FilamentCard;

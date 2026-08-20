@@ -6,11 +6,7 @@ type ImageLightboxProps = {
 	onClose: () => void;
 };
 
-export default function ImageLightbox({
-	src,
-	alt,
-	onClose,
-}: ImageLightboxProps) {
+const ImageLightbox = ({ src, alt, onClose }: ImageLightboxProps) => {
 	useEffect(() => {
 		function handleKeyDown(e: KeyboardEvent) {
 			if (e.key === "Escape") onClose();
@@ -43,4 +39,6 @@ export default function ImageLightbox({
 			/>
 		</div>
 	);
-}
+};
+
+export default ImageLightbox;

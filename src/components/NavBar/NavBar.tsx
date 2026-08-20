@@ -2,13 +2,13 @@ import { NavLink } from "react-router-dom";
 import logo from "/assets/logo/icon-white.png";
 
 const links = [
+	{ to: "/", label: "Panel" },
 	{ to: "/machines", label: "Máquinas" },
 	{ to: "/filaments", label: "Filamentos" },
 	{ to: "/products", label: "Productos" },
-	{ to: "/settings", label: "Configuración" },
 ];
 
-export default function NavBar() {
+const NavBar = () => {
 	return (
 		<nav className="flex items-center gap-6 bg-brand px-6 py-3">
 			<div className="flex items-center gap-2">
@@ -37,4 +37,6 @@ export default function NavBar() {
 			</div>
 		</nav>
 	);
-}
+};
+
+export default NavBar;

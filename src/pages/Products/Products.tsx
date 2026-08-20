@@ -15,7 +15,7 @@ import ProductModal from "./modals/ProductModal";
 import ProductPriceModal from "./modals/ProductPriceModal";
 import ProductCard from "./ProductCard";
 
-export default function ProductsPage() {
+const ProductsPage = () => {
 	const { run } = useCrudDispatch();
 	const { items: products } = useAppSelector((state) => state.products);
 	const { page, totalPages, hasNext, hasPrev, loading, goToPage } =
@@ -29,32 +29,32 @@ export default function ProductsPage() {
 	const [priceModalOpen, setPriceModalOpen] = useState(false);
 	const [productToPrice, setProductToPrice] = useState<Product | null>(null);
 
-	function handleCreate() {
+	const handleCreate = () => {
 		setProductToEdit(null);
 		setModalOpen(true);
-	}
+	};
 
-	function handleEdit(product: Product) {
+	const handleEdit = (product: Product) => {
 		setProductToEdit(product);
 		setModalOpen(true);
-	}
+	};
 
-	function handleViewPrice(product: Product) {
+	const handleViewPrice = (product: Product) => {
 		setProductToPrice(product);
 		setPriceModalOpen(true);
-	}
+	};
 
-	function handleDelete(product: Product) {
+	const handleDelete = (product: Product) => {
 		setProductToDelete(product);
-	}
+	};
 
-	async function confirmDelete() {
+	const confirmDelete = async () => {
 		if (!productToDelete) return;
 		setDeleting(true);
 		await run(deleteProduct, productToDelete.id);
 		setDeleting(false);
 		setProductToDelete(null);
-	}
+	};
 
 	return (
 		<div className="flex h-full flex-col">
@@ -69,11 +69,8 @@ export default function ProductsPage() {
 				{!loading && products.length === 0 && (
 					<div className="rounded-xl border border-dashed border-border bg-surface/50 p-10 text-center">
 						<p className="font-display text-muted">
-							Todavía no cargaste ningún producto.
+							No se ha encontrado ningún producto.
 						</p>
-						<Button onClick={handleCreate} className="mt-4">
-							Cargar el primero
-						</Button>
 					</div>
 				)}
 
@@ -122,4 +119,6 @@ export default function ProductsPage() {
 			/>
 		</div>
 	);
-}
+};
+
+export default ProductsPage;

@@ -10,12 +10,12 @@ type ProductCardProps = {
 	onViewPrice: (product: Product) => void;
 };
 
-export default function ProductCard({
+const ProductCard = ({
 	product,
 	onEdit,
 	onDelete,
 	onViewPrice,
-}: ProductCardProps) {
+}: ProductCardProps) => {
 	const [lightboxOpen, setLightboxOpen] = useState(false);
 
 	return (
@@ -81,4 +81,6 @@ export default function ProductCard({
 			)}
 		</div>
 	);
-}
+};
+
+export default ProductCard;

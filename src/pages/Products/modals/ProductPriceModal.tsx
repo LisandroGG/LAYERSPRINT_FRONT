@@ -9,11 +9,7 @@ type PriceModalProps = {
 	product: Product | null;
 };
 
-export default function ProductPriceModal({
-	open,
-	onClose,
-	product,
-}: PriceModalProps) {
+const ProductPriceModal = ({ open, onClose, product }: PriceModalProps) => {
 	const [tierIndex, setTierIndex] = useState(2);
 
 	if (!open || !product?.cost) return null;
@@ -110,4 +106,6 @@ export default function ProductPriceModal({
 			</div>
 		</div>
 	);
-}
+};
+
+export default ProductPriceModal;

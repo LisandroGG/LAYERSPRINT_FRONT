@@ -22,11 +22,7 @@ type ProductModalProps = {
 	productToEdit: Product | null;
 };
 
-export default function ProductModal({
-	open,
-	onClose,
-	productToEdit,
-}: ProductModalProps) {
+const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 	const dispatch = useAppDispatch();
 	const { run } = useCrudDispatch();
 	const { items: machines } = useAppSelector((state) => state.machines);
@@ -80,31 +76,31 @@ export default function ProductModal({
 		0,
 	);
 
-	function updateRow(index: number, value: FilamentRowValue) {
+	const updateRow = (index: number, value: FilamentRowValue) => {
 		setFilamentRows((rows) =>
 			rows.map((r, i) => (i === index ? { ...r, ...value } : r)),
 		);
-	}
+	};
 
-	function removeRow(index: number) {
+	const removeRow = (index: number) => {
 		setFilamentRows((rows) => rows.filter((_, i) => i !== index));
-	}
+	};
 
-	function addRow() {
+	const addRow = () => {
 		setFilamentRows((rows) => [
 			...rows,
 			{ rowId: crypto.randomUUID(), filamentId: 0, gramsUsed: 0 },
 		]);
-	}
+	};
 
-	function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 		setImage(file);
 		setPreview(URL.createObjectURL(file));
-	}
+	};
 
-	async function handleSubmit(e: React.FormEvent) {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
 		const validRows = filamentRows
@@ -139,7 +135,7 @@ export default function ProductModal({
 		} finally {
 			setSubmitting(false);
 		}
-	}
+	};
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-4">
@@ -298,4 +294,6 @@ export default function ProductModal({
 			</div>
 		</div>
 	);
-}
+};
+
+export default ProductModal;

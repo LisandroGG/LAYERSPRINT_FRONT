@@ -7,11 +7,7 @@ type MachineCardProps = {
 	onDelete: (machine: Machine) => void;
 };
 
-export default function MachineCard({
-	machine,
-	onEdit,
-	onDelete,
-}: MachineCardProps) {
+const MachineCard = ({ machine, onEdit, onDelete }: MachineCardProps) => {
 	return (
 		<div className="rounded-xl border border-border bg-surface p-4 transition-colors hover:border-brand-light/50">
 			<h3 className="font-display text-base font-semibold text-white">
@@ -48,4 +44,6 @@ export default function MachineCard({
 			</div>
 		</div>
 	);
-}
+};
+
+export default MachineCard;

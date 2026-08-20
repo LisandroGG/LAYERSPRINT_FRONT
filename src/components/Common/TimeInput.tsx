@@ -3,10 +3,7 @@ type TimeInputProps = {
 	onChange: (totalMinutes: number) => void;
 };
 
-export default function TimeInput({
-	valueInMinutes,
-	onChange,
-}: TimeInputProps) {
+const TimeInput = ({ valueInMinutes, onChange }: TimeInputProps) => {
 	const hours = Math.floor(valueInMinutes / 60);
 	const minutes = valueInMinutes % 60;
 
@@ -49,4 +46,6 @@ export default function TimeInput({
 			</div>
 		</div>
 	);
-}
+};
+
+export default TimeInput;

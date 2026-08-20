@@ -28,11 +28,11 @@ const emptyForm: FilamentInput = {
 
 const MATERIALS = ["PLA", "PETG", "ABS", "TPU", "ASA"];
 
-export default function FilamentModal({
+const FilamentModal = ({
 	open,
 	onClose,
 	filamentToEdit,
-}: FilamentModalProps) {
+}: FilamentModalProps) => {
 	const { run } = useCrudDispatch();
 	const [form, setForm] = useState<FilamentInput>(emptyForm);
 	const [submitting, setSubmitting] = useState(false);
@@ -49,7 +49,7 @@ export default function FilamentModal({
 
 	if (!open) return null;
 
-	async function handleSubmit(e: React.FormEvent) {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
 		if (!form.brand.trim() || !form.color.trim()) {
@@ -70,7 +70,7 @@ export default function FilamentModal({
 		} finally {
 			setSubmitting(false);
 		}
-	}
+	};
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-4">
@@ -191,4 +191,6 @@ export default function FilamentModal({
 			</div>
 		</div>
 	);
-}
+};
+
+export default FilamentModal;

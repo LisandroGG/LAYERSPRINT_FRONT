@@ -18,13 +18,13 @@ const sizeClasses = {
 	md: "px-4 py-2 text-sm",
 };
 
-export default function Button({
+const Button = ({
 	variant = "primary",
 	size = "md",
 	className = "",
 	disabled,
 	...props
-}: ButtonProps) {
+}: ButtonProps) => {
 	return (
 		<button
 			disabled={disabled}
@@ -32,4 +32,6 @@ export default function Button({
 			{...props}
 		/>
 	);
-}
+};
+
+export default Button;

@@ -10,7 +10,7 @@ type ConfirmModalProps = {
 	loading?: boolean;
 };
 
-export default function ConfirmModal({
+const ConfirmModal = ({
 	open,
 	title,
 	message,
@@ -18,7 +18,7 @@ export default function ConfirmModal({
 	onConfirm,
 	onCancel,
 	loading = false,
-}: ConfirmModalProps) {
+}: ConfirmModalProps) => {
 	if (!open) return null;
 
 	return (
@@ -40,4 +40,6 @@ export default function ConfirmModal({
 			</div>
 		</div>
 	);
-}
+};
+
+export default ConfirmModal;

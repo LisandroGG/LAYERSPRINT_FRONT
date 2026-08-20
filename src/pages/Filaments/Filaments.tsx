@@ -14,7 +14,7 @@ import Pagination from "../../components/Common/Pagination";
 import FilamentCard from "./FilamentCard";
 import FilamentModal from "./modals/FilamentModal";
 
-export default function FilamentsPage() {
+const FilamentsPage = () => {
 	const { run } = useCrudDispatch();
 	const { items: filaments } = useAppSelector((state) => state.filaments);
 	const { page, totalPages, hasNext, hasPrev, loading, goToPage } =
@@ -28,27 +28,27 @@ export default function FilamentsPage() {
 	);
 	const [deleting, setDeleting] = useState(false);
 
-	function handleCreate() {
+	const handleCreate = () => {
 		setFilamentToEdit(null);
 		setModalOpen(true);
-	}
+	};
 
-	function handleEdit(filament: Filament) {
+	const handleEdit = (filament: Filament) => {
 		setFilamentToEdit(filament);
 		setModalOpen(true);
-	}
+	};
 
-	function handleDelete(filament: Filament) {
+	const handleDelete = (filament: Filament) => {
 		setFilamentToDelete(filament);
-	}
+	};
 
-	async function confirmDelete() {
+	const confirmDelete = async () => {
 		if (!filamentToDelete) return;
 		setDeleting(true);
 		await run(deleteFilament, filamentToDelete.id);
 		setDeleting(false);
 		setFilamentToDelete(null);
-	}
+	};
 
 	return (
 		<div className="flex h-full flex-col">
@@ -63,15 +63,12 @@ export default function FilamentsPage() {
 				{!loading && filaments.length === 0 && (
 					<div className="rounded-xl border border-dashed border-border bg-surface/50 p-10 text-center">
 						<p className="font-display text-muted">
-							Todavía no cargaste ningún filamento.
+							No se ha encontrado ningún filamento.
 						</p>
-						<Button onClick={handleCreate} className="mt-4">
-							Cargar el primero
-						</Button>
 					</div>
 				)}
 
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 					{filaments.map((filament) => (
 						<FilamentCard
 							key={filament.id}
@@ -110,4 +107,6 @@ export default function FilamentsPage() {
 			/>
 		</div>
 	);
-}
+};
+
+export default FilamentsPage;

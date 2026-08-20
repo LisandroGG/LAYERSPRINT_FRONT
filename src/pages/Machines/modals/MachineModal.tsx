@@ -19,11 +19,7 @@ type MachineModalProps = {
 
 const emptyForm: MachineInput = { name: "", watts: 0, depreciationPerHour: 0 };
 
-export default function MachineModal({
-	open,
-	onClose,
-	machineToEdit,
-}: MachineModalProps) {
+const MachineModal = ({ open, onClose, machineToEdit }: MachineModalProps) => {
 	const { run } = useCrudDispatch();
 	const [form, setForm] = useState<MachineInput>(emptyForm);
 	const [submitting, setSubmitting] = useState(false);
@@ -40,7 +36,7 @@ export default function MachineModal({
 
 	if (!open) return null;
 
-	async function handleSubmit(e: React.FormEvent) {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
 		if (!form.name.trim()) {
@@ -61,7 +57,7 @@ export default function MachineModal({
 		} finally {
 			setSubmitting(false);
 		}
-	}
+	};
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-4">
@@ -138,4 +134,6 @@ export default function MachineModal({
 			</div>
 		</div>
 	);
-}
+};
+
+export default MachineModal;

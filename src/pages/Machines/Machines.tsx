@@ -14,7 +14,7 @@ import { useState } from "react";
 import MachineCard from "./MachineCard";
 import MachineModal from "./modals/MachineModal";
 
-export default function MachinesPage() {
+const MachinesPage = () => {
 	const { run } = useCrudDispatch();
 	const { items: machines } = useAppSelector((state) => state.machines);
 	const { page, totalPages, hasNext, hasPrev, loading, goToPage } =
@@ -25,33 +25,33 @@ export default function MachinesPage() {
 	const [machineToDelete, setMachineToDelete] = useState<Machine | null>(null);
 	const [deleting, setDeleting] = useState(false);
 
-	function handleCreate() {
+	const handleCreate = () => {
 		setMachineToEdit(null);
 		setModalOpen(true);
-	}
+	};
 
-	function handleEdit(machine: Machine) {
+	const handleEdit = (machine: Machine) => {
 		setMachineToEdit(machine);
 		setModalOpen(true);
-	}
+	};
 
-	function handleDelete(machine: Machine) {
+	const handleDelete = (machine: Machine) => {
 		setMachineToDelete(machine);
-	}
+	};
 
-	async function confirmDelete() {
+	const confirmDelete = async () => {
 		if (!machineToDelete) return;
 		setDeleting(true);
 		await run(deleteMachine, machineToDelete.id);
 		setDeleting(false);
 		setMachineToDelete(null);
-	}
+	};
 
 	return (
 		<div className="flex h-full flex-col">
 			<PageHeader
 				title="Máquinas"
-				action={<Button onClick={handleCreate}>+ Nuevo máquina</Button>}
+				action={<Button onClick={handleCreate}>+ Nueva máquina</Button>}
 			/>
 
 			<div className="flex-1 overflow-y-auto p-6">
@@ -60,9 +60,8 @@ export default function MachinesPage() {
 				{!loading && machines.length === 0 && (
 					<div className="rounded-xl border border-dashed border-border bg-surface/50 p-10 text-center">
 						<p className="font-display text-muted">
-							Todavía no cargaste ninguna máquina.
+							No se ha encontrado ninguna máquina.
 						</p>
-						<Button onClick={handleCreate}>Cargar la primera</Button>
 					</div>
 				)}
 
@@ -105,4 +104,6 @@ export default function MachinesPage() {
 			/>
 		</div>
 	);
-}
+};
+
+export default MachinesPage;

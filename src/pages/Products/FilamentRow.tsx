@@ -14,12 +14,12 @@ type FilamentRowProps = {
 	onRemove: () => void;
 };
 
-export default function FilamentRow({
+const FilamentRow = ({
 	value,
 	filaments,
 	onChange,
 	onRemove,
-}: FilamentRowProps) {
+}: FilamentRowProps) => {
 	const selected = filaments.find((f) => f.id === value.filamentId);
 
 	return (
@@ -65,4 +65,6 @@ export default function FilamentRow({
 			</Button>
 		</div>
 	);
-}
+};
+
+export default FilamentRow;
