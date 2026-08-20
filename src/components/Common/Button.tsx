@@ -22,11 +22,13 @@ const Button = ({
 	variant = "primary",
 	size = "md",
 	className = "",
+	type = "button",
 	disabled,
 	...props
 }: ButtonProps) => {
 	return (
 		<button
+			type={type}
 			disabled={disabled}
 			className={`cursor-pointer rounded-lg font-medium transition-colors disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
 			{...props}

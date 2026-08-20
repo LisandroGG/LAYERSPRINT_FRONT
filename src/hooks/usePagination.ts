@@ -3,7 +3,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 type PaginationState = {
-	page: number;
 	totalPages: number;
 	hasNext: boolean;
 	hasPrev: boolean;
@@ -17,8 +16,9 @@ const usePagination = (
 	fetchAction: FetchAction,
 ) => {
 	const dispatch = useDispatch<AppDispatch>();
-	const { page, totalPages, hasNext, hasPrev, loading } = useSelector(selector);
+	const { totalPages, hasNext, hasPrev, loading } = useSelector(selector);
 
+	const [page, setPage] = useState(1);
 	const [filters, setFilters] = useState<Record<string, unknown>>({});
 
 	useEffect(() => {
@@ -28,28 +28,26 @@ const usePagination = (
 	const goToPage = useCallback(
 		(newPage: number) => {
 			if (newPage < 1 || newPage > totalPages) return;
-			dispatch(fetchAction({ page: newPage, ...filters }));
+			setPage(newPage);
 		},
-		[dispatch, fetchAction, totalPages, filters],
+		[totalPages],
 	);
 
 	const next = useCallback(() => {
-		if (hasNext) {
-			dispatch(fetchAction({ page: page + 1, ...filters }));
-		}
-	}, [dispatch, fetchAction, hasNext, page, filters]);
+		if (hasNext) setPage((p) => p + 1);
+	}, [hasNext]);
 
 	const prev = useCallback(() => {
-		if (hasPrev) {
-			dispatch(fetchAction({ page: page - 1, ...filters }));
-		}
-	}, [dispatch, fetchAction, hasPrev, page, filters]);
+		if (hasPrev) setPage((p) => p - 1);
+	}, [hasPrev]);
 
 	const applyFilters = useCallback((newFilters: Record<string, unknown>) => {
+		setPage(1);
 		setFilters(newFilters || {});
 	}, []);
 
 	const clearFilters = useCallback(() => {
+		setPage(1);
 		setFilters({});
 	}, []);
 

@@ -1,11 +1,11 @@
 import { NavLink } from "react-router-dom";
 import logo from "/assets/logo/icon-white.png";
+import KwhChip from "./KwhChip";
 
 const links = [
-	{ to: "/", label: "Panel" },
-	{ to: "/machines", label: "Máquinas" },
+	{ to: "/", label: "Productos" },
 	{ to: "/filaments", label: "Filamentos" },
-	{ to: "/products", label: "Productos" },
+	{ to: "/machines", label: "Máquinas" },
 ];
 
 const NavBar = () => {
@@ -34,6 +34,9 @@ const NavBar = () => {
 						{link.label}
 					</NavLink>
 				))}
+			</div>
+			<div className="ml-auto">
+				<KwhChip />
 			</div>
 		</nav>
 	);

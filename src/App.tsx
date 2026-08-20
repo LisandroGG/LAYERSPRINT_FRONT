@@ -1,5 +1,4 @@
 import NavBar from "@components/NavBar/NavBar";
-import DashboardPage from "@pages/Dashboard/Dashboard";
 import FilamentsPage from "@pages/Filaments/Filaments";
 import MachinesPage from "@pages/Machines/Machines";
 import ProductsPage from "@pages/Products/Products";
@@ -13,10 +12,9 @@ const App = () => {
 			<NavBar />
 			<main className="flex-1 overflow-hidden">
 				<Routes>
-					<Route path="/" element={<DashboardPage />} />
+					<Route path="/" element={<ProductsPage />} />
 					<Route path="/machines" element={<MachinesPage />} />
 					<Route path="/filaments" element={<FilamentsPage />} />
-					<Route path="/products" element={<ProductsPage />} />
 				</Routes>
 			</main>
 		</div>

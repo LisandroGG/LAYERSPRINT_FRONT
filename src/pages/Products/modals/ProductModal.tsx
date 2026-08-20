@@ -1,4 +1,5 @@
 import Button from "@components/Common/Button";
+import ConfirmModal from "@components/Common/ConfirmModal";
 import TimeInput from "@components/Common/TimeInput";
 import useCrudDispatch from "@hooks/useCrudDispatch";
 import { fetchFilamentsNoPaginated } from "@redux/features/filaments/filamentThunks";
@@ -39,6 +40,7 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 	const [image, setImage] = useState<File | undefined>(undefined);
 	const [preview, setPreview] = useState<string | null>(null);
 	const [submitting, setSubmitting] = useState(false);
+	const [rowToDelete, setRowToDelete] = useState<number | null>(null);
 
 	useEffect(() => {
 		if (!machines.length) dispatch(fetchMachinesNoPaginated());
@@ -55,6 +57,20 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 			setExtras(productToEdit.extras);
 			setPreview(productToEdit.imageUrl);
 			setImage(undefined);
+
+			if (productToEdit.ProductFilaments?.length) {
+				setFilamentRows(
+					productToEdit.ProductFilaments.map((pf) => ({
+						rowId: crypto.randomUUID(),
+						filamentId: pf.filamentId,
+						gramsUsed: pf.gramsUsed,
+					})),
+				);
+			} else {
+				setFilamentRows([
+					{ rowId: crypto.randomUUID(), filamentId: 0, gramsUsed: 0 },
+				]);
+			}
 		} else {
 			setName("");
 			setMachineId("");
@@ -82,8 +98,14 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 		);
 	};
 
-	const removeRow = (index: number) => {
-		setFilamentRows((rows) => rows.filter((_, i) => i !== index));
+	const handleRemoveRequest = (index: number) => {
+		setRowToDelete(index);
+	};
+
+	const confirmRemoveRow = () => {
+		if (rowToDelete === null) return;
+		setFilamentRows((rows) => rows.filter((_, i) => i !== rowToDelete));
+		setRowToDelete(null);
 	};
 
 	const addRow = () => {
@@ -139,7 +161,7 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-4">
-			<div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl border border-border bg-surface p-6 shadow-xl">
+			<div className="flex max-h-[90vh] w-full max-w-xl flex-col rounded-xl border border-border bg-surface p-6 shadow-xl">
 				<h2 className="mb-4 font-display text-lg font-semibold text-white">
 					{productToEdit ? "Editar producto" : "Nuevo producto"}
 				</h2>
@@ -219,22 +241,22 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 
 					<div>
 						<div className="mb-2 flex items-center justify-between">
-							<label htmlFor="filaments" className="text-sm text-muted">
+							<label htmlFor="filamentsUsed" className="text-sm text-muted">
 								Filamentos usados
 							</label>
 							<span className="font-mono text-xs text-brand-light">
-								{totalWeight}g total
+								{totalWeight}gr total
 							</span>
 						</div>
 
-						<div className="space-y-2">
+						<div className="max-h-48 space-y-2 overflow-y-auto overflow-x-hidden pr-1 styled-scroll">
 							{filamentRows.map((row, index) => (
 								<FilamentRow
 									key={row.rowId}
 									value={row}
 									filaments={filaments}
 									onChange={(value) => updateRow(index, value)}
-									onRemove={() => removeRow(index)}
+									onRemove={() => handleRemoveRequest(index)}
 								/>
 							))}
 						</div>
@@ -242,7 +264,7 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 						<button
 							type="button"
 							onClick={addRow}
-							className="mt-2 text-sm text-brand-light hover:text-white cursor-pointer"
+							className="mt-2 cursor-pointer text-sm text-brand-light hover:text-white"
 						>
 							+ agregar filamento
 						</button>
@@ -291,6 +313,13 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 						</Button>
 					</div>
 				</form>
+				<ConfirmModal
+					open={rowToDelete !== null}
+					title="Eliminar filamento"
+					message="¿Sacar este filamento de la lista? Vas a tener que volver a agregarlo si te arrepentís."
+					onConfirm={confirmRemoveRow}
+					onCancel={() => setRowToDelete(null)}
+				/>
 			</div>
 		</div>
 	);

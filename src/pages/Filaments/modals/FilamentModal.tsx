@@ -26,7 +26,7 @@ const emptyForm: FilamentInput = {
 	pricePerKg: 0,
 };
 
-const MATERIALS = ["PLA", "PETG", "ABS", "TPU", "ASA"];
+const MATERIALS = ["PLA", "PLA Lite", "PETG", "ABS", "TPU", "ASA"];
 
 const FilamentModal = ({
 	open,
@@ -88,7 +88,7 @@ const FilamentModal = ({
 							type="text"
 							value={form.brand}
 							onChange={(e) => setForm({ ...form, brand: e.target.value })}
-							placeholder="PrintaLot"
+							placeholder="BambuLab"
 							className="w-full rounded-lg border border-border bg-ink px-3 py-2 text-white outline-none focus:border-brand"
 						/>
 					</div>

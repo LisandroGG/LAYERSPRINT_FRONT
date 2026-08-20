@@ -1,5 +1,8 @@
 import Button from "@components/Common/Button";
 import ConfirmModal from "@components/Common/ConfirmModal";
+import Loading from "@components/Common/Loading";
+import NotFind from "@components/Common/NotFind";
+import SearchInput from "@components/Common/SearchInput";
 import PageHeader from "@components/PageHeader/PageHeader";
 import useCrudDispatch from "@hooks/useCrudDispatch";
 import usePagination from "@hooks/usePagination";
@@ -17,8 +20,15 @@ import FilamentModal from "./modals/FilamentModal";
 const FilamentsPage = () => {
 	const { run } = useCrudDispatch();
 	const { items: filaments } = useAppSelector((state) => state.filaments);
-	const { page, totalPages, hasNext, hasPrev, loading, goToPage } =
-		usePagination((state) => state.filaments, fetchFilaments);
+	const {
+		page,
+		totalPages,
+		hasNext,
+		hasPrev,
+		loading,
+		goToPage,
+		applyFilters,
+	} = usePagination((state) => state.filaments, fetchFilaments);
 
 	const [modalOpen, setModalOpen] = useState(false);
 	const [filamentToEdit, setFilamentToEdit] = useState<Filament | null>(null);
@@ -27,6 +37,10 @@ const FilamentsPage = () => {
 		null,
 	);
 	const [deleting, setDeleting] = useState(false);
+
+	const handleSearch = (value: string) => {
+		applyFilters(value ? { search: value } : {});
+	};
 
 	const handleCreate = () => {
 		setFilamentToEdit(null);
@@ -52,21 +66,18 @@ const FilamentsPage = () => {
 
 	return (
 		<div className="flex h-full flex-col">
-			<PageHeader
-				title="Filamentos"
-				action={<Button onClick={handleCreate}>+ Nuevo filamento</Button>}
-			/>
+			<PageHeader title="Filamentos">
+				<SearchInput
+					placeholder="Buscar filamento..."
+					onSearch={handleSearch}
+				/>
+				<Button onClick={handleCreate}>+ Nuevo filamento</Button>
+			</PageHeader>
 
 			<div className="flex-1 overflow-y-auto p-6">
-				{loading && <p className="font-mono text-sm text-muted">Cargando...</p>}
+				{loading && filaments.length === 0 && <Loading />}
 
-				{!loading && filaments.length === 0 && (
-					<div className="rounded-xl border border-dashed border-border bg-surface/50 p-10 text-center">
-						<p className="font-display text-muted">
-							No se ha encontrado ningún filamento.
-						</p>
-					</div>
-				)}
+				{!loading && filaments.length === 0 && <NotFind entity="filamento" />}
 
 				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 					{filaments.map((filament) => (

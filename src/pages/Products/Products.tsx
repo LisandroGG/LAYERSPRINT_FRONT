@@ -1,6 +1,9 @@
 import Button from "@components/Common/Button";
 import ConfirmModal from "@components/Common/ConfirmModal";
+import Loading from "@components/Common/Loading";
+import NotFind from "@components/Common/NotFind";
 import Pagination from "@components/Common/Pagination";
+import SearchInput from "@components/Common/SearchInput";
 import PageHeader from "@components/PageHeader/PageHeader";
 import useCrudDispatch from "@hooks/useCrudDispatch";
 import usePagination from "@hooks/usePagination";
@@ -18,8 +21,15 @@ import ProductCard from "./ProductCard";
 const ProductsPage = () => {
 	const { run } = useCrudDispatch();
 	const { items: products } = useAppSelector((state) => state.products);
-	const { page, totalPages, hasNext, hasPrev, loading, goToPage } =
-		usePagination((state) => state.products, fetchProducts);
+	const {
+		page,
+		totalPages,
+		hasNext,
+		hasPrev,
+		loading,
+		goToPage,
+		applyFilters,
+	} = usePagination((state) => state.products, fetchProducts);
 
 	const [modalOpen, setModalOpen] = useState(false);
 	const [productToEdit, setProductToEdit] = useState<Product | null>(null);
@@ -28,6 +38,10 @@ const ProductsPage = () => {
 
 	const [priceModalOpen, setPriceModalOpen] = useState(false);
 	const [productToPrice, setProductToPrice] = useState<Product | null>(null);
+
+	const handleSearch = (value: string) => {
+		applyFilters(value ? { search: value } : {});
+	};
 
 	const handleCreate = () => {
 		setProductToEdit(null);
@@ -58,21 +72,15 @@ const ProductsPage = () => {
 
 	return (
 		<div className="flex h-full flex-col">
-			<PageHeader
-				title="Productos"
-				action={<Button onClick={handleCreate}>+ Nuevo producto</Button>}
-			/>
+			<PageHeader title="Productos">
+				<SearchInput placeholder="Buscar producto..." onSearch={handleSearch} />
+				<Button onClick={handleCreate}>+ Nuevo producto</Button>
+			</PageHeader>
 
 			<div className="flex-1 overflow-y-auto p-6">
-				{loading && <p className="font-mono text-sm text-muted">Cargando...</p>}
+				{loading && products.length === 0 && <Loading />}
 
-				{!loading && products.length === 0 && (
-					<div className="rounded-xl border border-dashed border-border bg-surface/50 p-10 text-center">
-						<p className="font-display text-muted">
-							No se ha encontrado ningún producto.
-						</p>
-					</div>
-				)}
+				{!loading && products.length === 0 && <NotFind entity="producto" />}
 
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{products.map((product) => (

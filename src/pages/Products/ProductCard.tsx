@@ -1,6 +1,7 @@
 import Button from "@components/Common/Button";
 import ImageLightbox from "@components/ImageLightbox/ImageLightbox";
 import type { Product } from "@redux/features/products/productTypes";
+import { formatMinutesToHours } from "@utils/formatTime";
 import { useState } from "react";
 
 type ProductCardProps = {
@@ -42,15 +43,29 @@ const ProductCard = ({
 				<h3 className="font-display text-base font-semibold text-white">
 					{product.name}
 				</h3>
-				<p className="text-sm text-muted">
-					{product.weight}g · {product.timeToPrint}min
-				</p>
+				<div className="mt-2 flex items-center justify-between">
+					<button
+						type="button"
+						onClick={() => onViewPrice(product)}
+						className="cursor-pointer text-xs text-muted underline decoration-dotted hover:text-brand-light"
+					>
+						{product.weight}gr en {product.ProductFilaments?.length ?? 0}{" "}
+						filamento(s)
+					</button>
+					<p className="text-sm text-muted">
+						{formatMinutesToHours(product.timeToPrint)}
+					</p>
+				</div>
 
 				{product.cost && (
 					<div className="mt-3 flex items-baseline justify-between">
 						<span className="text-xs text-muted">Costo</span>
 						<span className="font-mono text-lg font-semibold text-accent">
-							${product.cost.total.toLocaleString("es-AR")}
+							$
+							{product.cost.total.toLocaleString("es-AR", {
+								minimumFractionDigits: 2,
+								maximumFractionDigits: 2,
+							})}
 						</span>
 					</div>
 				)}

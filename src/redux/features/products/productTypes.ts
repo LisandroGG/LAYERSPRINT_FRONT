@@ -1,6 +1,15 @@
+import type { Filament } from "../filaments/filamentTypes";
+
 export type ProductFilamentEntry = {
 	filamentId: number;
 	gramsUsed: number;
+};
+
+export type ProductFilamentDetail = {
+	id: number;
+	gramsUsed: number;
+	filamentId: number;
+	Filament: Filament;
 };
 
 export type ProductCost = {
@@ -21,6 +30,7 @@ export type Product = {
 	imageUrl: string | null;
 	imagePublicId: string | null;
 	cost?: ProductCost;
+	ProductFilaments?: ProductFilamentDetail[];
 };
 
 export type ProductInput = {

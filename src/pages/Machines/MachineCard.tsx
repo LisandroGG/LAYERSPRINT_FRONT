@@ -20,7 +20,14 @@ const MachineCard = ({ machine, onEdit, onDelete }: MachineCardProps) => {
 				</p>
 				<p>
 					Desgaste:{" "}
-					<span className="text-white">${machine.depreciationPerHour}/h</span>
+					<span className="text-white">
+						$
+						{machine.depreciationPerHour.toLocaleString("es-AR", {
+							minimumFractionDigits: 2,
+							maximumFractionDigits: 2,
+						})}
+						/h
+					</span>
 				</p>
 			</div>
 

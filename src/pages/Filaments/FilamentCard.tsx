@@ -30,7 +30,7 @@ const FilamentCard = ({ filament, onEdit, onDelete }: FilamentCardProps) => {
 			<div className="mt-3 flex items-center justify-between">
 				<span className="text-sm text-muted">{filament.color}</span>
 				<span className="font-mono text-sm text-white">
-					${filament.pricePerKg}/kg
+					${filament.pricePerKg.toLocaleString("es-AR")}/kg
 				</span>
 			</div>
 

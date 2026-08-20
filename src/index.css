@@ -27,3 +27,20 @@ body {
 	background-color: var(--color-ink);
 	font-family: var(--font-body);
 }
+
+.styled-scroll::-webkit-scrollbar {
+	width: 6px;
+}
+
+.styled-scroll::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.styled-scroll::-webkit-scrollbar-thumb {
+	background-color: var(--color-border);
+	border-radius: 9999px;
+}
+
+.styled-scroll::-webkit-scrollbar-thumb:hover {
+	background-color: var(--color-brand-light);
+}

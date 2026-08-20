@@ -22,6 +22,8 @@ const emptyForm: MachineInput = { name: "", watts: 0, depreciationPerHour: 0 };
 const MachineModal = ({ open, onClose, machineToEdit }: MachineModalProps) => {
 	const { run } = useCrudDispatch();
 	const [form, setForm] = useState<MachineInput>(emptyForm);
+	const [wattsInput, setWattsInput] = useState("");
+	const [depreciationInput, setDepreciationInput] = useState("");
 	const [submitting, setSubmitting] = useState(false);
 
 	// biome-ignore lint: useEffectBug
@@ -29,8 +31,12 @@ const MachineModal = ({ open, onClose, machineToEdit }: MachineModalProps) => {
 		if (machineToEdit) {
 			const { name, watts, depreciationPerHour } = machineToEdit;
 			setForm({ name, watts, depreciationPerHour });
+			setWattsInput(String(watts));
+			setDepreciationInput(String(depreciationPerHour));
 		} else {
 			setForm(emptyForm);
+			setWattsInput("");
+			setDepreciationInput("");
 		}
 	}, [machineToEdit, open]);
 
@@ -86,12 +92,16 @@ const MachineModal = ({ open, onClose, machineToEdit }: MachineModalProps) => {
 							Watts
 						</label>
 						<input
-							type="number"
+							type="text"
+							inputMode="numeric"
 							id="Watts"
-							value={form.watts}
-							onChange={(e) =>
-								setForm({ ...form, watts: Number(e.target.value) })
-							}
+							value={wattsInput}
+							onChange={(e) => {
+								const raw = e.target.value;
+								if (!/^\d*$/.test(raw)) return;
+								setWattsInput(raw);
+								setForm({ ...form, watts: raw === "" ? 0 : Number(raw) });
+							}}
 							className="w-full rounded-lg border border-border bg-ink px-3 py-2 font-mono text-white outline-none focus:border-brand"
 						/>
 					</div>
@@ -104,16 +114,20 @@ const MachineModal = ({ open, onClose, machineToEdit }: MachineModalProps) => {
 							Desgaste por hora ($)
 						</label>
 						<input
-							type="number"
-							step="0.01"
+							type="text"
+							inputMode="decimal"
 							id="DepreciationPerHour"
-							value={form.depreciationPerHour}
-							onChange={(e) =>
+							value={depreciationInput}
+							onChange={(e) => {
+								const raw = e.target.value.replace(",", ".");
+								if (!/^\d*\.?\d*$/.test(raw)) return;
+								setDepreciationInput(e.target.value);
 								setForm({
 									...form,
-									depreciationPerHour: Number(e.target.value),
-								})
-							}
+									depreciationPerHour:
+										raw === "" || raw === "." ? 0 : Number(raw),
+								});
+							}}
 							className="w-full rounded-lg border border-border bg-ink px-3 py-2 font-mono text-white outline-none focus:border-brand"
 						/>
 					</div>

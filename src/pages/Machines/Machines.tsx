@@ -1,6 +1,9 @@
 import Button from "@components/Common/Button";
 import ConfirmModal from "@components/Common/ConfirmModal";
+import Loading from "@components/Common/Loading";
+import NotFind from "@components/Common/NotFind";
 import Pagination from "@components/Common/Pagination";
+import SearchInput from "@components/Common/SearchInput";
 import PageHeader from "@components/PageHeader/PageHeader";
 import useCrudDispatch from "@hooks/useCrudDispatch";
 import usePagination from "@hooks/usePagination";
@@ -17,13 +20,24 @@ import MachineModal from "./modals/MachineModal";
 const MachinesPage = () => {
 	const { run } = useCrudDispatch();
 	const { items: machines } = useAppSelector((state) => state.machines);
-	const { page, totalPages, hasNext, hasPrev, loading, goToPage } =
-		usePagination((state) => state.machines, fetchMachines);
+	const {
+		page,
+		totalPages,
+		hasNext,
+		hasPrev,
+		loading,
+		goToPage,
+		applyFilters,
+	} = usePagination((state) => state.machines, fetchMachines);
 
 	const [modalOpen, setModalOpen] = useState(false);
 	const [machineToEdit, setMachineToEdit] = useState<Machine | null>(null);
 	const [machineToDelete, setMachineToDelete] = useState<Machine | null>(null);
 	const [deleting, setDeleting] = useState(false);
+
+	const handleSearch = (value: string) => {
+		applyFilters(value ? { search: value } : {});
+	};
 
 	const handleCreate = () => {
 		setMachineToEdit(null);
@@ -49,20 +63,16 @@ const MachinesPage = () => {
 
 	return (
 		<div className="flex h-full flex-col">
-			<PageHeader
-				title="Máquinas"
-				action={<Button onClick={handleCreate}>+ Nueva máquina</Button>}
-			/>
+			<PageHeader title="Máquinas">
+				<SearchInput placeholder="Buscar máquina..." onSearch={handleSearch} />
+				<Button onClick={handleCreate}>+ Nueva máquina</Button>
+			</PageHeader>
 
 			<div className="flex-1 overflow-y-auto p-6">
-				{loading && <p className="font-mono text-sm text-muted">Cargando...</p>}
+				{loading && machines.length === 0 && <Loading />}
 
 				{!loading && machines.length === 0 && (
-					<div className="rounded-xl border border-dashed border-border bg-surface/50 p-10 text-center">
-						<p className="font-display text-muted">
-							No se ha encontrado ninguna máquina.
-						</p>
-					</div>
+					<NotFind entity="máquina" gender="feminine" />
 				)}
 
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
