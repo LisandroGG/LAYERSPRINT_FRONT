@@ -1,29 +1,38 @@
 type TimeInputProps = {
 	valueInMinutes: number;
 	onChange: (totalMinutes: number) => void;
+	hasError?: boolean;
 };
 
-const TimeInput = ({ valueInMinutes, onChange }: TimeInputProps) => {
+const TimeInput = ({ valueInMinutes, onChange, hasError }: TimeInputProps) => {
 	const hours = Math.floor(valueInMinutes / 60);
 	const minutes = valueInMinutes % 60;
 
-	function handleHoursChange(newHours: number) {
+	const handleHoursChange = (raw: string) => {
+		if (!/^\d*$/.test(raw)) return;
+		const newHours = raw === "" ? 0 : Number(raw);
 		onChange(newHours * 60 + minutes);
-	}
+	};
 
-	function handleMinutesChange(newMinutes: number) {
-		onChange(hours * 60 + newMinutes);
-	}
+	const handleMinutesChange = (raw: string) => {
+		if (!/^\d*$/.test(raw)) return;
+		const capped = raw === "" ? 0 : Math.min(Number(raw), 59);
+		onChange(hours * 60 + capped);
+	};
+
+	const borderClass = hasError ? "border-danger" : "border-border";
 
 	return (
 		<div className="flex gap-2">
 			<div className="flex-1">
-				<div className="flex items-center rounded-lg border border-border bg-ink px-3 focus-within:border-brand">
+				<div
+					className={`flex items-center rounded-lg border bg-ink px-3 focus-within:border-brand ${borderClass}`}
+				>
 					<input
-						type="number"
-						min={0}
+						type="text"
+						inputMode="numeric"
 						value={hours || ""}
-						onChange={(e) => handleHoursChange(Number(e.target.value) || 0)}
+						onChange={(e) => handleHoursChange(e.target.value)}
 						placeholder="0"
 						className="w-full bg-transparent py-2 font-mono text-white outline-none"
 					/>
@@ -31,13 +40,14 @@ const TimeInput = ({ valueInMinutes, onChange }: TimeInputProps) => {
 				</div>
 			</div>
 			<div className="flex-1">
-				<div className="flex items-center rounded-lg border border-border bg-ink px-3 focus-within:border-brand">
+				<div
+					className={`flex items-center rounded-lg border bg-ink px-3 focus-within:border-brand ${borderClass}`}
+				>
 					<input
-						type="number"
-						min={0}
-						max={59}
+						type="text"
+						inputMode="numeric"
 						value={minutes || ""}
-						onChange={(e) => handleMinutesChange(Number(e.target.value) || 0)}
+						onChange={(e) => handleMinutesChange(e.target.value)}
 						placeholder="0"
 						className="w-full bg-transparent py-2 font-mono text-white outline-none"
 					/>

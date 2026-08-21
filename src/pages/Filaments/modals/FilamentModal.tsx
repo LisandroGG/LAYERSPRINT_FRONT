@@ -9,13 +9,17 @@ import type {
 	FilamentInput,
 } from "@redux/features/filaments/filamentTypes";
 import { getColorHex } from "@utils/colorSwatch";
+import {
+	type FilamentErrors,
+	validateFilament,
+} from "@utils/validations/filamentValidations";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 type FilamentModalProps = {
 	open: boolean;
 	onClose: () => void;
 	filamentToEdit: Filament | null;
+	onSaved: () => void;
 };
 
 const emptyForm: FilamentInput = {
@@ -32,10 +36,12 @@ const FilamentModal = ({
 	open,
 	onClose,
 	filamentToEdit,
+	onSaved,
 }: FilamentModalProps) => {
 	const { run } = useCrudDispatch();
 	const [form, setForm] = useState<FilamentInput>(emptyForm);
 	const [submitting, setSubmitting] = useState(false);
+	const [errors, setErrors] = useState<FilamentErrors>({});
 
 	// biome-ignore lint: useEffectBug
 	useEffect(() => {
@@ -45,6 +51,7 @@ const FilamentModal = ({
 		} else {
 			setForm(emptyForm);
 		}
+		setErrors({});
 	}, [filamentToEdit, open]);
 
 	if (!open) return null;
@@ -52,10 +59,9 @@ const FilamentModal = ({
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (!form.brand.trim() || !form.color.trim()) {
-			toast.error("Marca y color son obligatorios");
-			return;
-		}
+		const validationErrors = validateFilament(form);
+		setErrors(validationErrors);
+		if (Object.keys(validationErrors).length > 0) return;
 
 		setSubmitting(true);
 		try {
@@ -64,6 +70,7 @@ const FilamentModal = ({
 			} else {
 				await run(createFilament, form);
 			}
+			onSaved();
 			onClose();
 		} catch {
 			// el toast de error ya lo maneja useCrudDispatch
@@ -89,8 +96,13 @@ const FilamentModal = ({
 							value={form.brand}
 							onChange={(e) => setForm({ ...form, brand: e.target.value })}
 							placeholder="BambuLab"
-							className="w-full rounded-lg border border-border bg-ink px-3 py-2 text-white outline-none focus:border-brand"
+							className={`w-full rounded-lg border bg-ink px-3 py-2 text-white outline-none focus:border-brand ${
+								errors.brand ? "border-danger" : "border-border"
+							}`}
 						/>
+						{errors.brand && (
+							<p className="mt-1 text-xs text-danger">{errors.brand}</p>
+						)}
 					</div>
 
 					<div className="grid grid-cols-2 gap-3">
@@ -129,8 +141,13 @@ const FilamentModal = ({
 								onChange={(e) =>
 									setForm({ ...form, diameter: Number(e.target.value) })
 								}
-								className="w-full rounded-lg border border-border bg-ink px-3 py-2 font-mono text-white outline-none focus:border-brand"
+								className={`w-full rounded-lg border bg-ink px-3 py-2 text-white outline-none focus:border-brand ${
+									errors.diameter ? "border-danger" : "border-border"
+								}`}
 							/>
+							{errors.diameter && (
+								<p className="mt-1 text-xs text-danger">{errors.diameter}</p>
+							)}
 						</div>
 					</div>
 
@@ -152,8 +169,13 @@ const FilamentModal = ({
 								value={form.color}
 								onChange={(e) => setForm({ ...form, color: e.target.value })}
 								placeholder="Negro"
-								className="w-full rounded-lg border border-border bg-ink px-3 py-2 text-white outline-none focus:border-brand"
+								className={`w-full rounded-lg border bg-ink px-3 py-2 text-white outline-none focus:border-brand ${
+									errors.color ? "border-danger" : "border-border"
+								}`}
 							/>
+							{errors.color && (
+								<p className="mt-1 text-xs text-danger">{errors.color}</p>
+							)}
 						</div>
 					</div>
 
@@ -165,14 +187,25 @@ const FilamentModal = ({
 							Precio por kg ($)
 						</label>
 						<input
-							type="number"
-							step="1"
-							value={form.pricePerKg}
-							onChange={(e) =>
-								setForm({ ...form, pricePerKg: Number(e.target.value) })
-							}
-							className="w-full rounded-lg border border-border bg-ink px-3 py-2 font-mono text-white outline-none focus:border-brand"
+							type="text"
+							placeholder="0"
+							inputMode="decimal"
+							value={form.pricePerKg === 0 ? "" : form.pricePerKg}
+							onChange={(e) => {
+								const raw = e.target.value.replace(",", ".");
+								if (!/^\d*\.?\d*$/.test(raw)) return;
+								setForm({
+									...form,
+									pricePerKg: raw === "" || raw === "." ? 0 : Number(raw),
+								});
+							}}
+							className={`w-full rounded-lg border bg-ink px-3 py-2 text-white outline-none focus:border-brand ${
+								errors.pricePerKg ? "border-danger" : "border-border"
+							}`}
 						/>
+						{errors.pricePerKg && (
+							<p className="mt-1 text-xs text-danger">{errors.pricePerKg}</p>
+						)}
 					</div>
 
 					<div className="flex justify-end gap-2 pt-2">

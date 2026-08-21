@@ -1,10 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-	createFilament,
 	deleteFilament,
 	fetchFilaments,
 	fetchFilamentsNoPaginated,
-	updateFilament,
 } from "./filamentThunks";
 import type { FilamentState } from "./filamentTypes";
 
@@ -54,15 +52,6 @@ const filamentSlice = createSlice({
 			})
 			.addCase(fetchFilamentsNoPaginated.fulfilled, (state, action) => {
 				state.items = action.payload;
-			})
-			.addCase(createFilament.fulfilled, (state, action) => {
-				state.items.push(action.payload.filament);
-			})
-			.addCase(updateFilament.fulfilled, (state, action) => {
-				const index = state.items.findIndex(
-					(f) => f.id === action.payload.filament.id,
-				);
-				if (index !== -1) state.items[index] = action.payload.filament;
 			})
 			.addCase(deleteFilament.fulfilled, (state, action) => {
 				state.items = state.items.filter((f) => f.id !== action.payload.id);

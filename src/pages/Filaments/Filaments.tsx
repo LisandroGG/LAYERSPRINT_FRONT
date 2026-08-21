@@ -28,6 +28,7 @@ const FilamentsPage = () => {
 		loading,
 		goToPage,
 		applyFilters,
+		refresh,
 	} = usePagination((state) => state.filaments, fetchFilaments);
 
 	const [modalOpen, setModalOpen] = useState(false);
@@ -62,6 +63,7 @@ const FilamentsPage = () => {
 		await run(deleteFilament, filamentToDelete.id);
 		setDeleting(false);
 		setFilamentToDelete(null);
+		refresh();
 	};
 
 	return (
@@ -107,6 +109,7 @@ const FilamentsPage = () => {
 				open={modalOpen}
 				onClose={() => setModalOpen(false)}
 				filamentToEdit={filamentToEdit}
+				onSaved={refresh}
 			/>
 			<ConfirmModal
 				open={!!filamentToDelete}

@@ -2,8 +2,10 @@ import { MARGIN_TIERS } from "@constants/marginTiers";
 import type { Product } from "@redux/features/products/productTypes";
 import { getColorHex } from "@utils/colorSwatch";
 import { formatMinutesToHours } from "@utils/formatTime";
-import { ChevronDown } from "lucide-react";
+import shareProduct from "@utils/shareProducts";
+import { ChevronDown, Share2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type PriceModalProps = {
 	open: boolean;
@@ -15,6 +17,7 @@ const ProductPriceModal = ({ open, onClose, product }: PriceModalProps) => {
 	const [tierIndex, setTierIndex] = useState(2);
 	const [filamentsOpen, setFilamentsOpen] = useState(false);
 	const [costOpen, setCostOpen] = useState(false);
+	const [sharing, setSharing] = useState(false);
 
 	if (!open || !product?.cost) return null;
 
@@ -26,6 +29,14 @@ const ProductPriceModal = ({ open, onClose, product }: PriceModalProps) => {
 		setFilamentsOpen(false);
 		setCostOpen(false);
 		onClose();
+	};
+
+	const handleShare = async () => {
+		setSharing(true);
+		const result = await shareProduct(product, suggestedPrice);
+		setSharing(false);
+
+		if (result.copied) toast.success("Copiado al portapapeles");
 	};
 
 	return (
@@ -202,15 +213,26 @@ const ProductPriceModal = ({ open, onClose, product }: PriceModalProps) => {
 					</div>
 				</div>
 
-				<div className="mt-4 rounded-lg bg-brand p-4 text-center">
-					<p className="text-xs text-white/70">Venta sugerida</p>
-					<p className="font-display text-2xl font-bold text-white">
-						$
-						{suggestedPrice.toLocaleString("es-AR", {
-							minimumFractionDigits: 2,
-							maximumFractionDigits: 2,
-						})}
-					</p>
+				<div className="mt-4 rounded-lg bg-brand p-4">
+					<div className="text-center">
+						<p className="text-xs text-white/70">Venta sugerida</p>
+						<p className="font-display text-2xl font-bold text-white">
+							$
+							{suggestedPrice.toLocaleString("es-AR", {
+								minimumFractionDigits: 2,
+								maximumFractionDigits: 2,
+							})}
+						</p>
+					</div>
+					<button
+						type="button"
+						onClick={handleShare}
+						disabled={sharing}
+						className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-white/10 py-2 text-sm font-medium text-white hover:bg-white/20 disabled:opacity-50"
+					>
+						<Share2 size={14} />
+						{sharing ? "Compartiendo" : "Compartir"}
+					</button>
 				</div>
 			</div>
 		</div>

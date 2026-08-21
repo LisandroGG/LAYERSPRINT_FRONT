@@ -8,23 +8,33 @@ import type {
 	Machine,
 	MachineInput,
 } from "@redux/features/machines/machineTypes";
+import {
+	type MachineErrors,
+	validateMachine,
+} from "@utils/validations/machineValidations";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 type MachineModalProps = {
 	open: boolean;
 	onClose: () => void;
 	machineToEdit: Machine | null;
+	onSaved: () => void;
 };
 
 const emptyForm: MachineInput = { name: "", watts: 0, depreciationPerHour: 0 };
 
-const MachineModal = ({ open, onClose, machineToEdit }: MachineModalProps) => {
+const MachineModal = ({
+	open,
+	onClose,
+	machineToEdit,
+	onSaved,
+}: MachineModalProps) => {
 	const { run } = useCrudDispatch();
 	const [form, setForm] = useState<MachineInput>(emptyForm);
 	const [wattsInput, setWattsInput] = useState("");
 	const [depreciationInput, setDepreciationInput] = useState("");
 	const [submitting, setSubmitting] = useState(false);
+	const [errors, setErrors] = useState<MachineErrors>({});
 
 	// biome-ignore lint: useEffectBug
 	useEffect(() => {
@@ -38,6 +48,7 @@ const MachineModal = ({ open, onClose, machineToEdit }: MachineModalProps) => {
 			setWattsInput("");
 			setDepreciationInput("");
 		}
+		setErrors({});
 	}, [machineToEdit, open]);
 
 	if (!open) return null;
@@ -45,10 +56,9 @@ const MachineModal = ({ open, onClose, machineToEdit }: MachineModalProps) => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (!form.name.trim()) {
-			toast.error("El nombre es obligatorio");
-			return;
-		}
+		const validationErrors = validateMachine(form);
+		setErrors(validationErrors);
+		if (Object.keys(validationErrors).length > 0) return;
 
 		setSubmitting(true);
 		try {
@@ -57,6 +67,7 @@ const MachineModal = ({ open, onClose, machineToEdit }: MachineModalProps) => {
 			} else {
 				await run(createMachine, form);
 			}
+			onSaved();
 			onClose();
 		} catch {
 			// el toast de error ya lo maneja useCrudDispatch
@@ -83,8 +94,13 @@ const MachineModal = ({ open, onClose, machineToEdit }: MachineModalProps) => {
 							value={form.name}
 							onChange={(e) => setForm({ ...form, name: e.target.value })}
 							placeholder="Bambu Lab A1"
-							className="w-full rounded-lg border border-border bg-ink px-3 py-2 text-white outline-none focus:border-brand"
+							className={`w-full rounded-lg border bg-ink px-3 py-2 text-white outline-none focus:border-brand ${
+								errors.name ? "border-danger" : "border-border"
+							}`}
 						/>
+						{errors.name && (
+							<p className="mt-1 text-xs text-danger">{errors.name}</p>
+						)}
 					</div>
 
 					<div>
@@ -102,8 +118,13 @@ const MachineModal = ({ open, onClose, machineToEdit }: MachineModalProps) => {
 								setWattsInput(raw);
 								setForm({ ...form, watts: raw === "" ? 0 : Number(raw) });
 							}}
-							className="w-full rounded-lg border border-border bg-ink px-3 py-2 font-mono text-white outline-none focus:border-brand"
+							className={`w-full rounded-lg border bg-ink px-3 py-2 text-white outline-none focus:border-brand ${
+								errors.watts ? "border-danger" : "border-border"
+							}`}
 						/>
+						{errors.watts && (
+							<p className="mt-1 text-xs text-danger">{errors.watts}</p>
+						)}
 					</div>
 
 					<div>
@@ -128,8 +149,15 @@ const MachineModal = ({ open, onClose, machineToEdit }: MachineModalProps) => {
 										raw === "" || raw === "." ? 0 : Number(raw),
 								});
 							}}
-							className="w-full rounded-lg border border-border bg-ink px-3 py-2 font-mono text-white outline-none focus:border-brand"
+							className={`w-full rounded-lg border bg-ink px-3 py-2 text-white outline-none focus:border-brand ${
+								errors.depreciationPerHour ? "border-danger" : "border-border"
+							}`}
 						/>
+						{errors.depreciationPerHour && (
+							<p className="mt-1 text-xs text-danger">
+								{errors.depreciationPerHour}
+							</p>
+						)}
 					</div>
 
 					<div className="flex justify-end gap-2 pt-2">

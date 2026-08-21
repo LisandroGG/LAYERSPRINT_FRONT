@@ -29,6 +29,7 @@ const ProductsPage = () => {
 		loading,
 		goToPage,
 		applyFilters,
+		refresh,
 	} = usePagination((state) => state.products, fetchProducts);
 
 	const [modalOpen, setModalOpen] = useState(false);
@@ -68,6 +69,7 @@ const ProductsPage = () => {
 		await run(deleteProduct, productToDelete.id);
 		setDeleting(false);
 		setProductToDelete(null);
+		refresh();
 	};
 
 	return (
@@ -111,6 +113,7 @@ const ProductsPage = () => {
 				open={modalOpen}
 				onClose={() => setModalOpen(false)}
 				productToEdit={productToEdit}
+				onSaved={refresh}
 			/>
 			<ProductPriceModal
 				open={priceModalOpen}

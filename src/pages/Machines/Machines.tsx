@@ -28,6 +28,7 @@ const MachinesPage = () => {
 		loading,
 		goToPage,
 		applyFilters,
+		refresh,
 	} = usePagination((state) => state.machines, fetchMachines);
 
 	const [modalOpen, setModalOpen] = useState(false);
@@ -59,6 +60,7 @@ const MachinesPage = () => {
 		await run(deleteMachine, machineToDelete.id);
 		setDeleting(false);
 		setMachineToDelete(null);
+		refresh();
 	};
 
 	return (
@@ -103,6 +105,7 @@ const MachinesPage = () => {
 				open={modalOpen}
 				onClose={() => setModalOpen(false)}
 				machineToEdit={machineToEdit}
+				onSaved={refresh}
 			/>
 			<ConfirmModal
 				open={!!machineToDelete}

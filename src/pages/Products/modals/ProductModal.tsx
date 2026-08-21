@@ -13,17 +13,26 @@ import type {
 	ProductInput,
 } from "@redux/features/products/productTypes";
 import { useAppDispatch, useAppSelector } from "@redux/hooks";
+import {
+	type ProductErrors,
+	validateProduct,
+} from "@utils/validations/productValidations";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import FilamentRow, { type FilamentRowValue } from "../FilamentRow";
 
 type ProductModalProps = {
 	open: boolean;
 	onClose: () => void;
 	productToEdit: Product | null;
+	onSaved: () => void;
 };
 
-const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
+const ProductModal = ({
+	open,
+	onClose,
+	productToEdit,
+	onSaved,
+}: ProductModalProps) => {
 	const dispatch = useAppDispatch();
 	const { run } = useCrudDispatch();
 	const { items: machines } = useAppSelector((state) => state.machines);
@@ -41,6 +50,7 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 	const [preview, setPreview] = useState<string | null>(null);
 	const [submitting, setSubmitting] = useState(false);
 	const [rowToDelete, setRowToDelete] = useState<number | null>(null);
+	const [errors, setErrors] = useState<ProductErrors>({});
 
 	useEffect(() => {
 		if (!machines.length) dispatch(fetchMachinesNoPaginated());
@@ -83,6 +93,7 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 			setPreview(null);
 			setImage(undefined);
 		}
+		setErrors({});
 	}, [productToEdit, open]);
 
 	if (!open) return null;
@@ -129,10 +140,14 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 			.filter((r) => r.filamentId && r.gramsUsed > 0)
 			.map(({ filamentId, gramsUsed }) => ({ filamentId, gramsUsed }));
 
-		if (!name.trim() || !machineId || !validRows.length) {
-			toast.error("Nombre, máquina y al menos un filamento son obligatorios");
-			return;
-		}
+		const validationErrors = validateProduct({
+			name,
+			machineId,
+			timeToPrint,
+			hasValidFilaments: validRows.length > 0,
+		});
+		setErrors(validationErrors);
+		if (Object.keys(validationErrors).length > 0) return;
 
 		const payload: ProductInput = {
 			name,
@@ -151,6 +166,7 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 			} else {
 				await run(createProduct, payload);
 			}
+			onSaved();
 			onClose();
 		} catch {
 			// el toast de error ya lo maneja useCrudDispatch
@@ -195,9 +211,14 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 								id="name"
 								value={name}
 								onChange={(e) => setName(e.target.value)}
-								placeholder="Panda"
-								className="w-full rounded-lg border border-border bg-ink px-3 py-2 text-white outline-none focus:border-brand"
+								placeholder="Goku"
+								className={`w-full rounded-lg border bg-ink px-3 py-2 text-white outline-none focus:border-brand ${
+									errors.name ? "border-danger" : "border-border"
+								}`}
 							/>
+							{errors.name && (
+								<p className="mt-1 text-xs text-danger">{errors.name}</p>
+							)}
 						</div>
 					</div>
 
@@ -213,7 +234,9 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 								id="machineId"
 								value={machineId}
 								onChange={(e) => setMachineId(Number(e.target.value))}
-								className="w-full rounded-lg border border-border bg-ink px-3 py-2 text-white outline-none focus:border-brand"
+								className={`w-full rounded-lg border bg-ink px-3 py-2 text-white outline-none focus:border-brand ${
+									errors.machineId ? "border-danger" : "border-border"
+								}`}
 							>
 								<option value="" disabled>
 									Elegí máquina
@@ -224,6 +247,9 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 									</option>
 								))}
 							</select>
+							{errors.machineId && (
+								<p className="mt-1 text-xs text-danger">{errors.machineId}</p>
+							)}
 						</div>
 						<div>
 							<label
@@ -234,8 +260,16 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 							</label>
 							<TimeInput
 								valueInMinutes={timeToPrint}
-								onChange={setTimeToPrint}
+								onChange={(value) => {
+									setTimeToPrint(value);
+									if (errors.timeToPrint)
+										setErrors({ ...errors, timeToPrint: undefined });
+								}}
+								hasError={!!errors.timeToPrint}
 							/>
+							{errors.timeToPrint && (
+								<p className="mt-1 text-xs text-danger">{errors.timeToPrint}</p>
+							)}
 						</div>
 					</div>
 
@@ -268,6 +302,9 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 						>
 							+ agregar filamento
 						</button>
+						{errors.filaments && (
+							<p className="mt-1 text-xs text-danger">{errors.filaments}</p>
+						)}
 					</div>
 
 					<div className="grid grid-cols-2 gap-3">
@@ -279,10 +316,15 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 								Mano de obra ($)
 							</label>
 							<input
-								type="number"
-								id="laborCost"
-								value={laborCost}
-								onChange={(e) => setLaborCost(Number(e.target.value))}
+								type="text"
+								placeholder="0"
+								inputMode="decimal"
+								value={laborCost === 0 ? "" : laborCost}
+								onChange={(e) => {
+									const raw = e.target.value.replace(",", ".");
+									if (!/^\d*\.?\d*$/.test(raw)) return;
+									setLaborCost(raw === "" || raw === "." ? 0 : Number(raw));
+								}}
 								className="w-full rounded-lg border border-border bg-ink px-3 py-2 font-mono text-white outline-none focus:border-brand"
 							/>
 						</div>
@@ -291,10 +333,15 @@ const ProductModal = ({ open, onClose, productToEdit }: ProductModalProps) => {
 								Extras ($)
 							</label>
 							<input
-								type="number"
-								id="extras"
-								value={extras}
-								onChange={(e) => setExtras(Number(e.target.value))}
+								type="text"
+								placeholder="0"
+								inputMode="decimal"
+								value={extras === 0 ? "" : extras}
+								onChange={(e) => {
+									const raw = e.target.value.replace(",", ".");
+									if (!/^\d*\.?\d*$/.test(raw)) return;
+									setExtras(raw === "" || raw === "." ? 0 : Number(raw));
+								}}
 								className="w-full rounded-lg border border-border bg-ink px-3 py-2 font-mono text-white outline-none focus:border-brand"
 							/>
 						</div>

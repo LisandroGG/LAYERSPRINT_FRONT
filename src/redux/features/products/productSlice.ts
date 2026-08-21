@@ -1,11 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-	createProduct,
 	deleteProduct,
 	fetchProductById,
 	fetchProducts,
 	fetchProductsNoPaginated,
-	updateProduct,
 } from "./productThunks";
 import type { ProductState } from "./productTypes";
 
@@ -58,15 +56,6 @@ const productSlice = createSlice({
 			})
 			.addCase(fetchProductById.fulfilled, (state, action) => {
 				state.selected = action.payload;
-			})
-			.addCase(createProduct.fulfilled, (state, action) => {
-				state.items.push(action.payload.product);
-			})
-			.addCase(updateProduct.fulfilled, (state, action) => {
-				const index = state.items.findIndex(
-					(p) => p.id === action.payload.product.id,
-				);
-				if (index !== -1) state.items[index] = action.payload.product;
 			})
 			.addCase(deleteProduct.fulfilled, (state, action) => {
 				state.items = state.items.filter((p) => p.id !== action.payload.id);

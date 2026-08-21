@@ -51,6 +51,10 @@ const usePagination = (
 		setFilters({});
 	}, []);
 
+	const refresh = useCallback(() => {
+		dispatch(fetchAction({ page, ...filters }));
+	}, [dispatch, fetchAction, page, filters]);
+
 	return {
 		page,
 		totalPages,
@@ -63,6 +67,7 @@ const usePagination = (
 		applyFilters,
 		clearFilters,
 		filters,
+		refresh,
 	};
 };
 
